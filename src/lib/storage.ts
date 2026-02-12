@@ -1,23 +1,14 @@
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+// import { writeFile, mkdir } from 'fs/promises'
+// import { join } from 'path'
 
 export async function saveFile(file: File): Promise<string | null> {
     try {
-        const bytes = await file.arrayBuffer()
-        const buffer = Buffer.from(bytes)
+        // Cloudflare Pages / Edge Runtime does not support local file system (fs)
+        // You should use Cloudflare R2 or an external storage service (AWS S3, etc.)
+        console.warn('Local file saving is not supported on Edge Runtime. Please configure R2.')
 
-        // Ensure upload directory exists
-        const uploadDir = join(process.cwd(), 'public', 'uploads')
-        await mkdir(uploadDir, { recursive: true })
-
-        // Create unique filename
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`
-        const filename = `${uniqueSuffix}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`
-        const filepath = join(uploadDir, filename)
-
-        await writeFile(filepath, buffer)
-
-        return `/uploads/${filename}`
+        // For now, returning null or a placeholder to unblock build
+        return null
     } catch (error) {
         console.error('Error saving file:', error)
         return null
