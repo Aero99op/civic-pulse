@@ -7,13 +7,10 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "migrate-locs": "node scripts/migrate_locations.js",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "db:push:remote": "wrangler d1 migrations apply DB --remote"
+    "migrate-locs": "node scripts/migrate_locations.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@prisma/adapter-d1": "5.22.0",
     "@prisma/client": "5.22.0",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
