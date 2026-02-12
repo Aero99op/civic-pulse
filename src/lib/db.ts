@@ -10,6 +10,7 @@ const prismaClientSingleton = () => {
   // Check if we are running in a Cloudflare Worker environment with D1
   if (process.env.DB) {
     const adapter = new PrismaD1(process.env.DB as unknown as D1Database)
+    // @ts-ignore
     return new PrismaClient({ adapter })
   }
 
