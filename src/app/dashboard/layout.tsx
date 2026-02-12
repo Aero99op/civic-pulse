@@ -12,7 +12,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const { user } = useUserStore()
-  // ... existing code ...
+  const router = useRouter()
+
+  // Redirect to login/role selector if not authenticated
+  useEffect(() => {
+    if (!user) {
+      router.push('/')
+    }
+  }, [user, router])
 
   if (!user) {
     return null

@@ -23,7 +23,13 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       user: null,
       setUser: (user) => set({ user }),
-      logout: () => set({ user: null }),
+      logout: () => {
+        set({ user: null })
+        // Clear persisted storage to prevent rehydration race condition
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('civic-pulse-user')
+        }
+      },
     }),
     {
       name: 'civic-pulse-user',
