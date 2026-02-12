@@ -28,3 +28,27 @@ export async function addPoints(userId: string, amount: number) {
         return { success: false, error: (error as Error).message }
     }
 }
+export async function getGuestUser() {
+    try {
+        let user = await prisma.user.findUnique({
+            where: { email: 'citizen@example.com' }
+        })
+
+        if (!user) {
+            console.log("Guest user not found, creating...")
+            user = await prisma.user.create({
+                data: {
+                    email: 'citizen@example.com',
+                    name: 'Guest Citizen',
+                    role: 'CITIZEN',
+                    walletBalance: 100
+                }
+            })
+        }
+
+        return user
+    } catch (error) {
+        console.error('Failed to get guest user:', error)
+        return null
+    }
+}
