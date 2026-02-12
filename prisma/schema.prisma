@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  role          String        // "CITIZEN" | "DEPARTMENT"
+  department    String?       // For department users (e.g., "Roads", "Sanitation")
+  walletBalance Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  reports       Report[]
+  transactions  Transaction[]
+  redemptions   Redemption[]
+}
+
+model Report {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  category    String         // "POTHOLE", "GARBAGE", "LIGHTING", "OTHER"
+  mediaUrl    String?
+  latitude    Float
+  longitude   Float
+  address     String?
+  status      String         @default("SUBMITTED") // SUBMITTED, ACCEPTED, IN_PROGRESS, RESOLVED, VERIFIED
+  
+  authorId    String
+  author      User           @relation(fields: [authorId], references: [id])
+  
+  updates     ReportUpdate[]
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model ReportUpdate {
+  id        String   @id @default(cuid())
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id])
+  
+  status    String   // The new status
+  mediaUrl  String?
+  imageUrl  String?
+  videoUrl  String?
+  caption   String?
+  note      String?
+  latitude  Float?
+  longitude Float?
+  
+  createdAt DateTime @default(now())
+}
+
+model Reward {
+  id          String       @id @default(cuid())
+  name        String
+  description String
+  cost        Int
+  imageUrl    String?
+  type        String       // "CASH", "MERCH", "VOUCHER"
+  
+  redemptions Redemption[]
+}
+
+model Redemption {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rewardId  String
+  reward    Reward   @relation(fields: [rewardId], references: [id])
+  
+  status    String   @default("PENDING") // PENDING, COMPLETED
+  code      String?  // The generated voucher code
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Int      // Positive for earning, negative for spending
+  description String
+  type        String   // "EARNED", "SPENT"
+  
+  createdAt   DateTime @default(now())
+}
