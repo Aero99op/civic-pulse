@@ -14,8 +14,10 @@ const prismaClientSingleton = () => {
     return new PrismaClient({ adapter })
   }
 
-  // Fallback for local development (SQLite)
-  return new PrismaClient()
+  // Fallback for build time or local dev without DB var
+  return new PrismaClient({
+    datasourceUrl: process.env.DATABASE_URL || "file:./dev.db"
+  })
 }
 
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
