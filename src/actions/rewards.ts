@@ -63,15 +63,15 @@ export async function redeemReward(userId: string, rewardId: string) {
       data: { walletBalance: user.walletBalance - reward.cost }
     })
 
-    // 2. Create Redemption (Using Raw SQL to bypass stale client cache)
-    // Generate UUID manually since we are bypassing Prisma's @default(cuid())
-    const redemptionId = crypto.randomUUID()
-    const now = new Date().toISOString()
-
-    await prisma.$executeRaw`
-      INSERT INTO "Redemption" ("id", "userId", "rewardId", "code", "status", "createdAt")
-      VALUES (${redemptionId}, ${userId}, ${rewardId}, ${uniqueCode}, 'COMPLETED', ${now})
-    `
+    // 2. Create Redemption
+    await prisma.redemption.create({
+      data: {
+        userId,
+        rewardId,
+        code: uniqueCode,
+        status: 'COMPLETED',
+      }
+    })
 
     // 3. Create Transaction Record
     await prisma.transaction.create({
